@@ -1,13 +1,17 @@
 package com.example.dell.v2ex.JSON;
 
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,18 +23,31 @@ import java.util.List;
 public class JsonHelper {
     private String urlPath;
     private JsonData jsonData;
+    private Handler handler;
     private List<JsonData> jsonDatas;
 
     public JsonHelper(String urlPath){
         this.urlPath = urlPath;
     }
 
-    public List<JsonData> getData(){
+    public void getString(){
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                String jsonString = (String)msg.obj;
+                getData(jsonString);
+            }
+        };
+    }
+
+    public List<JsonData> getData(String jsonString){
         jsonDatas = new ArrayList<>();
         jsonData = new JsonData();
 
         try{
-            String jsonString = getJsonString(urlPath);//通过指定URL读取数据
+            getJsonString(urlPath);//通过指定URL读取数据
 
             JSONArray array = new JSONArray(jsonString);//最外层为[]，用JSONArray
             for(int i=0;i<array.length();i++){
@@ -53,6 +70,8 @@ public class JsonHelper {
                     jsonData.setMember_avatar_mini(memberObject.getString("avatar_mini"));
                     jsonData.setMember_avatar_normal(memberObject.getString("avatar_normal"));
                     jsonData.setMember_avatar_large(memberObject.getString("avatar_large"));
+
+                    Log.e("test_json","test");
                 }
 
                 JSONArray nodeArray = object.getJSONArray("node");//node节点
@@ -84,21 +103,49 @@ public class JsonHelper {
         return jsonDatas;
     }
 
-    private String getJsonString(String url) throws Exception {
-        String urlPath = url;
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        URL murl = new URL(urlPath);
-        HttpURLConnection connection = (HttpURLConnection)murl.openConnection();
-        InputStream inputStream = connection.getInputStream();
+    private void getJsonString(final String url) throws Exception {
 
-        byte[] data = new byte[1024];
-        int length = -1;
-        while((length = inputStream.read(data))!=-1){
-            outputStream.write(data,0,length);
-        }
-        inputStream.close();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Log.e("test","getJson1");
 
-        return new String(outputStream.toByteArray());
+                    String urlPath = url;
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+                    Log.e("test","getJson2");
+                    URL murl = new URL(urlPath);
+
+                    Log.e("test","getJson3");
+                    HttpURLConnection connection = (HttpURLConnection)murl.openConnection();
+
+                    Log.e("test","getJson4");
+                    InputStream inputStream = connection.getInputStream();
+
+                    Log.e("test","getJson5");
+                    byte[] data = new byte[1024];
+                    int length = -1;
+                    while((length = inputStream.read(data))!=-1){
+                        outputStream.write(data,0,length);
+                        Log.e("test",outputStream.toString());
+
+                    }
+                    inputStream.close();
+
+                    Message msg = new Message();
+                    msg.obj = outputStream.toString();
+                    
+                    handler.sendMessage(msg);
+
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+
     }
+
 
 }
