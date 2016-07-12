@@ -27,7 +27,7 @@ public class AllFragment extends Fragment{
     private ListView fragmentList;
     private ContentAdapter contentAdapter;
 
-    private final String Url = "https://www.v2ex.com/api/topics/latest.json";
+    private final String Url = "https://www.v2ex.com/api/topics/hot.json";
 
     @Nullable
     @Override
@@ -35,7 +35,6 @@ public class AllFragment extends Fragment{
         LayoutView = inflater.inflate(R.layout.fragmentlayout,container,false);
 
         fragmentList = (ListView)LayoutView.findViewById(R.id.fragmentList);
-
         Log.e("test","1");
 
         ArrayList<HashMap<String,String>> contentList = new ArrayList<>();
@@ -44,8 +43,10 @@ public class AllFragment extends Fragment{
         Log.e("test","2");
         JsonHelper jsonHelper = new JsonHelper(Url);//解析数据
         List<JsonData> datas = jsonHelper.getData(null);//取得所有解析的数据
+        Log.e("testBack",datas.toString());
 
         for(JsonData jsondata : datas){   //相当于用JsonHelper类解析一次之后把数据都储存在map中.
+            Log.e("testFor","test");
             map.put("id",jsondata.getId());
             map.put("title",jsondata.getTitle());
             map.put("content",jsondata.getContent());
@@ -77,6 +78,7 @@ public class AllFragment extends Fragment{
 
             contentList.add(map);
         }
+
         contentAdapter = new ContentAdapter(getActivity(),contentList);
         fragmentList.setAdapter(contentAdapter);
 
