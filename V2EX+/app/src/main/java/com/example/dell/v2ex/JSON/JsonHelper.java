@@ -30,6 +30,7 @@ public class JsonHelper {
     //private JsonDataCallBack callBack;
     private List<JsonData> jsonDatas;
 
+    /*
     private Handler handler =  new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -43,32 +44,51 @@ public class JsonHelper {
             }
         }
     };
+    */
 
-    public JsonHelper(String urlPath){//通过指定URL读取数据
+    public JsonHelper(final String urlPath, final JsonDataCallBack callBack){//通过指定URL读取数据
         this.urlPath = urlPath;
         Log.e("testJsonHelper","JsonHelper");
-        getJsonString(urlPath,new JsonDataCallBack(){
+        //getJsonString(urlPath);
 
+        new Thread(new Runnable() {
             @Override
-            public void onRespone(String response) {
+            public void run() {
+                try{
+                    Log.e("test","getJson1");
+                    //String urlPath = url;
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-                Message msg = new Message();
-                JsonData = new Bundle();
+                    Log.e("test","getJson2");
+                    URL murl = new URL(urlPath);
 
-                JsonData.putString("text",response);
-                msg.what = 1;
-                msg.setData(JsonData);
+                    Log.e("test","getJson3");
+                    HttpURLConnection connection = (HttpURLConnection)murl.openConnection();
 
-                Log.e("testHandler","testHandler");
-                handler.sendMessage(msg);
+                    Log.e("test","getJson4");
+                    InputStream inputStream = connection.getInputStream();
+
+                    Log.e("test","getJson5");
+                    byte[] data = new byte[1024];
+                    int length = -1;
+                    while((length = inputStream.read(data))!=-1){
+                        outputStream.write(data,0,length);
+                    }
+                    //passJsonData(outputStream.toString());
+                    //Log.e("testOutputStream",outputStream.toString());
+                    callBack.onRespone(outputStream.toString());
+
+                    inputStream.close();
+
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
 
-            @Override
-            public void onError(Exception e) {
-
-            }
-        });
+        }).start();
     }
+
 
     public List<JsonData> getData(String jsonString){
         jsonDatas = new ArrayList<>();
@@ -131,7 +151,10 @@ public class JsonHelper {
         return jsonDatas;
     }
 
-    private void getJsonString(final String url, final JsonDataCallBack callBack) {
+
+
+    /*
+    private void getJsonString(final String url,final JsonDataCallBack callBack) {
 
         new Thread(new Runnable() {
             @Override
@@ -156,7 +179,6 @@ public class JsonHelper {
                     while((length = inputStream.read(data))!=-1){
                         outputStream.write(data,0,length);
                     }
-                    callBack.onRespone(outputStream.toString());
                     //passJsonData(outputStream.toString());
                     //Log.e("testOutputStream",outputStream.toString());
 
@@ -170,6 +192,20 @@ public class JsonHelper {
 
         }).start();
     }
+    */
 
+    /*
+    public void passJsonData(String jsonData){
+        Message msg = new Message();
+        JsonData = new Bundle();
+
+        JsonData.putString("text",jsonData);
+        msg.what = 1;
+        msg.setData(JsonData);
+
+        Log.e("testHandler","testHandler");
+        handler.sendMessage(msg);
+    }
+    */
 
 }
