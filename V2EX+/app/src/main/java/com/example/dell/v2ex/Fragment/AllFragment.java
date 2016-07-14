@@ -50,6 +50,7 @@ public class AllFragment extends Fragment{
                 Log.e("testDatas",datas.toString());
                 for(JsonData jsondata : datas){   //相当于用JsonHelper类解析一次之后把数据都储存在map中.
 
+                    HashMap<String,String> map = new HashMap<>();//一定要将这个map设为局部变量，每次循环实例化一次(new一个新Map).
                     Log.e("testFor",jsondata.toString());
                     map.put("id",jsondata.getId());
                     map.put("title",jsondata.getTitle());
