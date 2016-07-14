@@ -3,6 +3,7 @@ package com.example.dell.v2ex.AsyncTask;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -59,7 +60,6 @@ public class DownloadImageTask extends AsyncTask<String,Integer,Bitmap> {
                     e.printStackTrace();
                 }
             }
-
         }
 
         return bitmap;

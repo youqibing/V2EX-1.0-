@@ -26,7 +26,7 @@ import java.util.List;
 public class JsonHelper {
     private String urlPath;
     private JsonData jsonData;
-    private Bundle JsonData;
+    //private Bundle JsonData;
     //private JsonDataCallBack callBack;
     private List<JsonData> jsonDatas;
 
@@ -89,15 +89,15 @@ public class JsonHelper {
         }).start();
     }
 
-
     public List<JsonData> getData(String jsonString){
         jsonDatas = new ArrayList<>();
-        jsonData = new JsonData();
 
         try{
             Log.e("TestJsonString",jsonString);
             JSONArray array = new JSONArray(jsonString);//最外层为[]，用JSONArray
+
             for(int i=0;i<array.length();i++){
+                jsonData = new JsonData();
 
                 JSONObject object = array.getJSONObject(i);
                 jsonData.setId(object.getString("id"));
@@ -117,7 +117,6 @@ public class JsonHelper {
                     jsonData.setMember_avatar_mini(memberObject.getString("avatar_mini"));
                     jsonData.setMember_avatar_normal(memberObject.getString("avatar_normal"));
                     jsonData.setMember_avatar_large(memberObject.getString("avatar_large"));
-
                 }
 
                 JSONObject nodeObject = object.getJSONObject("node");//node节点
@@ -140,15 +139,15 @@ public class JsonHelper {
                 jsonData.setLast_touched(object.getString("last_touched"));
 
                 jsonDatas.add(jsonData);
-
+                Log.e("test_json",jsonDatas.toString());
             }
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        Log.e("test_json","test");
         return jsonDatas;
+
     }
 
 

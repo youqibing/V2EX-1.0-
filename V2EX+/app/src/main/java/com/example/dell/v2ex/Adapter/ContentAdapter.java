@@ -1,6 +1,7 @@
 package com.example.dell.v2ex.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,7 @@ import java.util.HashMap;
 public class ContentAdapter extends BaseAdapter {
     private ArrayList<HashMap<String,String>> contentList;
     private Context context;
-    private LayoutInflater inflater = null;
+    private static LayoutInflater inflater = null;
     private ListView ImageListView;
 
     public ContentAdapter(Context context,ArrayList<HashMap<String,String>> contentList){
@@ -39,7 +40,7 @@ public class ContentAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return contentList.get(position);
     }
 
     @Override
@@ -66,6 +67,8 @@ public class ContentAdapter extends BaseAdapter {
         TextView content_tx =(TextView)convertView.findViewById(R.id.content_text);
 
         HashMap<String,String> ContentData = contentList.get(position);//获取每个位置上对应的数据
+        Log.e("test_ContentData",ContentData.toString());
+        //Log.e("test_contentList",contentList.toString());
 
         user_name.setText(ContentData.get("member_username"));
         node_tx.setText(ContentData.get("node_name"));
@@ -73,9 +76,9 @@ public class ContentAdapter extends BaseAdapter {
         content_tx.setText(ContentData.get("content"));
 
         DownloadImageTask downloadImageTask = new DownloadImageTask(ImageListView);
-        downloadImageTask.execute(ContentData.get("member_avatar_mini"));
+        downloadImageTask.execute("http:"+ContentData.get("member_avatar_large"));//必须加“http”,否则识别不了网页.
 
-        user_image.setTag(ContentData.get("member_avatar_mini"));
+        user_image.setTag("http:"+ContentData.get("member_avatar_large"));
 
         return convertView;
     }

@@ -25,7 +25,6 @@ import java.util.List;
 
 public class AllFragment extends Fragment{
     private View LayoutView;
-    private View Layout;
     private ListView fragmentList;
     private JsonHelper jsonHelper;
     private ContentAdapter contentAdapter;
@@ -34,23 +33,24 @@ public class AllFragment extends Fragment{
     HashMap<String,String> map = new HashMap<>();
     ArrayList<HashMap<String,String>> contentList = new ArrayList<>();
 
-    private final String Url = "https://www.v2ex.com/api/topics/hot.json";
+    private final String Url = "https://www.v2ex.com/api/topics/latest.json";
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,final ViewGroup container, Bundle savedInstanceState) {
         LayoutView = inflater.inflate(R.layout.fragmentlayout,container,false);
 
         fragmentList = (ListView)LayoutView.findViewById(R.id.fragmentList);
         Log.e("test","1");
 
-        Log.e("test","2");
         jsonHelper = new JsonHelper(Url, new JsonDataCallBack() {
             @Override
             public void onRespone(String response) {
                 datas =jsonHelper.getData(response);
+
+                Log.e("testDatas",datas.toString());
                 for(JsonData jsondata : datas){   //相当于用JsonHelper类解析一次之后把数据都储存在map中.
-                    Log.e("testFor","test");
+
+                    Log.e("testFor",jsondata.toString());
                     map.put("id",jsondata.getId());
                     map.put("title",jsondata.getTitle());
                     map.put("content",jsondata.getContent());
@@ -81,15 +81,26 @@ public class AllFragment extends Fragment{
                     map.put("node_url",jsondata.getNode_url());
 
                     contentList.add(map);
-
-                    contentAdapter = new ContentAdapter(getActivity(),contentList);
+                    //map.clear();
+                    Log.e("test_contentList",contentList.toString());
+                    /*
                     container.post(new Runnable() {
                         @Override
                         public void run() {
                             fragmentList.setAdapter(contentAdapter);
                         }
                     });
+                    */
                 }
+                contentAdapter = new ContentAdapter(getActivity(),contentList);
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fragmentList.setAdapter(contentAdapter);
+                    }
+                });
+
             }
 
             @Override
@@ -97,15 +108,11 @@ public class AllFragment extends Fragment{
 
             }
         });
-        Log.e("test","3");
+
+        Log.e("test","2");
         //List<JsonData> datas = jsonHelper.getData(null);//取得所有解析的数据
-        //Log.e("testBack",datas.toString());
 
-        if(LayoutView !=null){
-            Layout= LayoutView;
-        }
-
-        return Layout;
+        return LayoutView;
     }
 
 }
